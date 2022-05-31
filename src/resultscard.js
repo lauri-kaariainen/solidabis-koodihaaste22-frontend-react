@@ -38,6 +38,7 @@ export const ResultsCard = ({ results = [] }) => {
             ))}
           </List>
         </Stack>
+        <h5>päivitetty: {new Date().toLocaleTimeString()}</h5>
       </CardContent>
     </Card>
   );
