@@ -28,13 +28,21 @@ export default function App() {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCity, setSelectedCity] = useState("");
   const [voteResults, setVoteResults] = useState([]);
-
+  const [alreadyVotedId, setAlreadyVotedId] = useState(null);
+  const [date, setDate] = useState("");
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     if (selectedCity)
       fetch(`${restaurantSearchUrl + selectedCity}`)
         .then((r) => r.json())
-        .then((json) => setRestaurants((json && json.restaurants) || []));
+        .then((json) => {
+          if (json && json.alreadyVoted) {
+            setAlreadyVotedId(json.alreadyVoted);
+            console.log("already voted for", json.alreadyVoted);
+          }
+          if (json.date) setDate(json.date);
+          setRestaurants((json && json.restaurants) || []);
+        });
 
     fetch(`${voteResultsUrl}`)
       .then((r) => r.json())
@@ -71,7 +79,8 @@ export default function App() {
         />
         {voteResults.length ? <ResultsCard results={voteResults} /> : ""}
       </Stack>
-      {activeRestaurant ? (
+      {alreadyVotedId ? <div>Olet äänestänyt tänään {date}!</div> : ""}
+      {/* {activeRestaurant ? (
         <Stack direction="row" spacing={2}>
           <div>
             Olet äänestänyt tänään: <Button>{activeRestaurant.name}</Button>
@@ -86,7 +95,7 @@ export default function App() {
         </Stack>
       ) : (
         ""
-      )}
+      )} */}
       {selectedCity ? (
         <div>
           <h1>{selectedCity.toUpperCase()}</h1>
@@ -94,10 +103,9 @@ export default function App() {
             {restaurants.map((restaurant) => (
               <Restaurant
                 restaurant={restaurant}
+                key={restaurant.id}
                 selected={
-                  activeRestaurant
-                    ? activeRestaurant.name === restaurant.name
-                    : false
+                  alreadyVotedId ? alreadyVotedId === restaurant.id : false
                 }
                 clickVote={voteRestaurant.bind(null, restaurant)}
               />

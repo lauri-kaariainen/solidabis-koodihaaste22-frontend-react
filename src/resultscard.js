@@ -24,6 +24,7 @@ export const ResultsCard = ({
             //   {res.name}, {res.votes} ään{res.votes > 1 ? "tä" : "i"}
             // </Button>
             <List
+              key={"list" + res.id}
               dense={true}
               sx={{
                 width: "100%",
@@ -36,7 +37,7 @@ export const ResultsCard = ({
                 "& ul": { padding: 0 }
               }}
             >
-              <ListItem key={`item-${res.name}`}>
+              <ListItem key={`item-${res.id}`}>
                 <ListItemText
                   primary={`${res.name}, ${res.votes} ään${
                     res.votes > 1 ? "tä" : "i"
