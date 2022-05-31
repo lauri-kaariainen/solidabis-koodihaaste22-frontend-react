@@ -9,8 +9,7 @@ import Container from "@mui/material/Container";
 // import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-// import IconButton from "@mui/material/IconButton";
-// import DeleteIcon from "@mui/icons-material/Delete";
+
 import citiesObj from "./cities.json";
 
 // const city = "tampere";

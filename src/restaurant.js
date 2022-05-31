@@ -3,6 +3,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 export const Restaurant = ({
   restaurant,
@@ -17,6 +18,7 @@ export const Restaurant = ({
             onClick={clickVote}
             variant={selected ? "contained" : "outlined"}
             color="primary"
+            endIcon={selected ? <DeleteIcon /> : <p></p>}
           >
             {restaurant.name}
           </Button>
