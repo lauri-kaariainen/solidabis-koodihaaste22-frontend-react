@@ -12,6 +12,7 @@ export const ResultsCard = ({
   // selected = false,
   // clickVote = () => {}
 }) => {
+  console.log("rendering ResultsCard");
   return (
     <Card
       sx={{ minWidth: 275, marginTop: 5, maxHeight: 500, overflowY: "auto" }}
@@ -24,7 +25,7 @@ export const ResultsCard = ({
             //   {res.name}, {res.votes} ään{res.votes > 1 ? "tä" : "i"}
             // </Button>
             <List
-              key={"list" + res.id}
+              key={"list" + (res.id ? res.id : new Date())}
               dense={true}
               sx={{
                 width: "100%",

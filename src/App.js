@@ -1,16 +1,16 @@
 import "./styles.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 // import ReactDOM from 'react-dom';
 import { Restaurant } from "./restaurant";
 import { ConfirmDialog } from "./confirmdialog";
 import { ResultsCard } from "./resultscard";
 import Autocomplete from "@mui/material/Autocomplete";
 import Container from "@mui/material/Container";
-import Button from "@mui/material/Button";
+// import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
-import DeleteIcon from "@mui/icons-material/Delete";
+// import IconButton from "@mui/material/IconButton";
+// import DeleteIcon from "@mui/icons-material/Delete";
 import citiesObj from "./cities.json";
 
 // const city = "tampere";
@@ -21,15 +21,15 @@ const voteResultsUrl = "//lauri.space/solidabiskoodihaaste22/api/v1/results/";
 
 export default function App() {
   const [restaurants, setRestaurants] = useState([]);
-  const [activeRestaurant, setActiveRestaurant] = useState(null);
-  // const [activeVoteId, setActiveVoteId] = useState("");
-
+  // const [activeRestaurant, setActiveRestaurant] = useState(null);
   const [proposedRestaurant, setProposedRestaurant] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCity, setSelectedCity] = useState("");
   const [voteResults, setVoteResults] = useState([]);
   const [alreadyVotedId, setAlreadyVotedId] = useState(null);
   const [date, setDate] = useState("");
+  console.log("rendering App");
+  const voteResultUpdateIntervalRef = useRef();
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
     if (selectedCity)
@@ -49,6 +49,13 @@ export default function App() {
       .then((json) => setVoteResults((json && json.results) || []));
   }, [selectedCity]);
 
+  clearInterval(voteResultUpdateIntervalRef.current);
+  voteResultUpdateIntervalRef.current = setInterval(() => {
+    fetch(`${voteResultsUrl}`)
+      .then((r) => r.json())
+      .then((json) => setVoteResults((json && json.results) || []));
+  }, 6000);
+
   const voteRestaurant = (restaurant) => {
     setProposedRestaurant(restaurant);
     setOpenDialog(true);
@@ -61,7 +68,10 @@ export default function App() {
       method: "POST"
       // credentials: "include"
       // mode: "cors"
-    }).then((res) => console.log("POST Status", res.status));
+    }).then((res) => {
+      setAlreadyVotedId(restaurant.id);
+      console.log("POST Status", res.status);
+    });
   };
 
   return (
@@ -121,7 +131,7 @@ export default function App() {
         setOpenDialog={setOpenDialog}
         restaurant={proposedRestaurant}
         // restaurantId={}
-        setActiveRestaurant={setActiveRestaurant}
+        // setActiveRestaurant={setActiveRestaurant}
         handleVoteSuccess={handleVoteSuccess}
       />
     </Container>

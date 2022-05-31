@@ -6,11 +6,11 @@ export const ConfirmDialog = ({
   handleClose,
   openDialog,
   restaurant = { name: "Virhe" },
-  setActiveRestaurant,
+  // setActiveRestaurant,
   handleVoteSuccess
 }) => {
   const handleSuccess = () => {
-    setActiveRestaurant(restaurant);
+    // setActiveRestaurant(restaurant);
     handleVoteSuccess(restaurant);
     handleClose();
   };
