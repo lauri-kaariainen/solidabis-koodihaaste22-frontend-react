@@ -6,7 +6,8 @@ export const ConfirmDialog = ({
   handleClose,
   openDialog,
   restaurant = { name: "Virhe" },
-  handleVoteSuccess
+  handleVoteSuccess,
+  removingVote = false
 }) => {
   const handleSuccess = () => {
     handleVoteSuccess(restaurant);
@@ -19,7 +20,9 @@ export const ConfirmDialog = ({
       onClose={handleClose}
       open={openDialog}
     >
-      <DialogTitle>Äänestä ravintolaa?</DialogTitle>
+      <DialogTitle>
+        {removingVote ? "Poista ääni?" : "Äänestä ravintolaa?"}
+      </DialogTitle>
       <p
         style={{
           fontSize: "85%",

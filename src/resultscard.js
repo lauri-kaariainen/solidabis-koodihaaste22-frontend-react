@@ -6,7 +6,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 
 export const ResultsCard = ({ results = [] }) => {
-  console.log("rendering ResultsCard", results.length, results);
+  // console.log("rendering ResultsCard", results.length, results);
   return (
     <Card
       sx={{ minWidth: 275, marginTop: 5, maxHeight: 500, overflowY: "auto" }}

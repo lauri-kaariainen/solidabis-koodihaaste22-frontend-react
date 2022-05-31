@@ -27,7 +27,7 @@ export default function App() {
   const [voteResults, setVoteResults] = useState([]);
   const [alreadyVotedId, setAlreadyVotedId] = useState(null);
   const [date, setDate] = useState("");
-  console.log("rendering App");
+  // console.log("rendering App");
   const voteResultUpdateIntervalRef = useRef();
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
@@ -114,6 +114,9 @@ export default function App() {
         openDialog={openDialog}
         setOpenDialog={setOpenDialog}
         restaurant={proposedRestaurant}
+        removingVote={
+          proposedRestaurant ? alreadyVotedId === proposedRestaurant.id : false
+        }
         // restaurantId={}
         // setActiveRestaurant={setActiveRestaurant}
         handleVoteSuccess={handleVoteSuccess}
