@@ -28,7 +28,6 @@ export const Restaurant = ({
           {restaurant.dishes.map((dish) => (
             <div>
               {dish.name} {dish.price}
-              {/* <Typography color="text.secondary"></Typography> */}
             </div>
           ))}
         </div>

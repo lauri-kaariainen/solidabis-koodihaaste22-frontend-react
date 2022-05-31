@@ -66,8 +66,6 @@ export default function App() {
   const handleVoteSuccess = (restaurant) => {
     fetch("//lauri.space/solidabiskoodihaaste22/api/v1/vote/" + restaurant.id, {
       method: "POST"
-      // credentials: "include"
-      // mode: "cors"
     }).then((res) => {
       setAlreadyVotedId(restaurant.id);
       console.log("POST Status", res.status);
@@ -90,22 +88,6 @@ export default function App() {
         {voteResults.length ? <ResultsCard results={voteResults} /> : ""}
       </Stack>
       {alreadyVotedId ? <div>Olet äänestänyt tänään {date}!</div> : ""}
-      {/* {activeRestaurant ? (
-        <Stack direction="row" spacing={2}>
-          <div>
-            Olet äänestänyt tänään: <Button>{activeRestaurant.name}</Button>
-          </div>
-          <IconButton
-            aria-label="delete"
-            color="primary"
-            onClick={setActiveRestaurant.bind(null, null)}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Stack>
-      ) : (
-        ""
-      )} */}
       {selectedCity ? (
         <div>
           <h1>{selectedCity.toUpperCase()}</h1>
