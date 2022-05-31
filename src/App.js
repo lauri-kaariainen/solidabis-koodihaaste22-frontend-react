@@ -66,7 +66,10 @@ export default function App() {
     fetch("//lauri.space/solidabiskoodihaaste22/api/v1/vote/" + restaurant.id, {
       method: "POST"
     }).then((res) => {
-      setAlreadyVotedId(restaurant.id);
+      if (alreadyVotedId !== restaurant.id) {
+        setAlreadyVotedId(restaurant.id);
+      } else setAlreadyVotedId("");
+
       console.log("POST Status", res.status);
     });
   };
