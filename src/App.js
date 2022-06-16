@@ -53,7 +53,10 @@ export default function App() {
 
     fetch(`${voteResultsUrl}`)
       .then((r) => r.json())
-      .then((json) => setVoteResults((json && json.results) || []));
+      .then((json) => {
+        if (((json && json.results) || []).length) setShowResultsNotice(true);
+        setVoteResults((json && json.results) || []);
+      });
   }, [selectedCity]);
 
   clearInterval(voteResultUpdateIntervalRef.current);
@@ -83,7 +86,9 @@ export default function App() {
   }, 6000);
 
   //reset the notice icon
-  if (tab === "2" && showResultsNotice === true) setShowResultsNotice(false);
+  const resetNoticeIconIfNeeded = () => {
+    if (tab === "2" && showResultsNotice === true) setShowResultsNotice(false);
+  };
 
   const voteRestaurant = (restaurant) => {
     setProposedRestaurant(restaurant);
@@ -107,6 +112,8 @@ export default function App() {
       console.log("POST Status", res.status);
     });
   };
+
+  resetNoticeIconIfNeeded();
 
   return (
     <Container maxWidth="sm">
