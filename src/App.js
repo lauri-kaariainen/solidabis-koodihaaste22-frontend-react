@@ -34,6 +34,7 @@ export default function App() {
   const [alreadyVotedId, setAlreadyVotedId] = useState(null);
   const [date, setDate] = useState("");
   const [tab, setTab] = useState("1");
+  const [showResultsNotice, setShowResultsNotice] = useState(false);
   // console.log("rendering App");
   const voteResultUpdateIntervalRef = useRef();
   // Similar to componentDidMount and componentDidUpdate:
@@ -59,8 +60,30 @@ export default function App() {
   voteResultUpdateIntervalRef.current = setInterval(() => {
     fetch(`${voteResultsUrl}`)
       .then((r) => r.json())
-      .then((json) => setVoteResults((json && json.results) || []));
+      .then((json) => {
+        //if on vote-tab, calculate if results got changed,
+        //this uses just basic stringify comparison
+        if (tab !== "2") {
+          if (
+            JSON.stringify((json && json.results) || []) !==
+            JSON.stringify(voteResults)
+          ) {
+            console.log("updated results!");
+            console.log(
+              "compared",
+              JSON.stringify((json && json.results) || []),
+              "with"
+            );
+            console.log(JSON.stringify(voteResults));
+            setShowResultsNotice(true);
+          }
+        }
+        setVoteResults((json && json.results) || []);
+      });
   }, 6000);
+
+  //reset the notice icon
+  if (tab === "2" && showResultsNotice === true) setShowResultsNotice(false);
 
   const voteRestaurant = (restaurant) => {
     setProposedRestaurant(restaurant);
@@ -110,7 +133,7 @@ export default function App() {
             <Tab
               label="Tulokset"
               icon={
-                tab === "1" ? (
+                showResultsNotice ? (
                   <NewReleasesIcon fontSize="small" color="primary" />
                 ) : (
                   <></>
