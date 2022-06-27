@@ -10,6 +10,12 @@ import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import TabContext from "@mui/lab/TabContext";
+import TabList from "@mui/lab/TabList";
+import TabPanel from "@mui/lab/TabPanel";
+import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import citiesObj from "./cities.json";
 
 // const city = "tampere";
@@ -27,6 +33,8 @@ export default function App() {
   const [voteResults, setVoteResults] = useState([]);
   const [alreadyVotedId, setAlreadyVotedId] = useState(null);
   const [date, setDate] = useState("");
+  const [tab, setTab] = useState("1");
+  const [showResultsNotice, setShowResultsNotice] = useState(false);
   // console.log("rendering App");
   const voteResultUpdateIntervalRef = useRef();
   // Similar to componentDidMount and componentDidUpdate:
@@ -45,15 +53,42 @@ export default function App() {
 
     fetch(`${voteResultsUrl}`)
       .then((r) => r.json())
-      .then((json) => setVoteResults((json && json.results) || []));
+      .then((json) => {
+        if (((json && json.results) || []).length) setShowResultsNotice(true);
+        setVoteResults((json && json.results) || []);
+      });
   }, [selectedCity]);
 
   clearInterval(voteResultUpdateIntervalRef.current);
   voteResultUpdateIntervalRef.current = setInterval(() => {
     fetch(`${voteResultsUrl}`)
       .then((r) => r.json())
-      .then((json) => setVoteResults((json && json.results) || []));
+      .then((json) => {
+        //if on vote-tab, calculate if results got changed,
+        //this uses just basic stringify comparison
+        if (tab !== "2") {
+          if (
+            JSON.stringify((json && json.results) || []) !==
+            JSON.stringify(voteResults)
+          ) {
+            console.log("updated results!");
+            console.log(
+              "compared",
+              JSON.stringify((json && json.results) || []),
+              "with"
+            );
+            console.log(JSON.stringify(voteResults));
+            setShowResultsNotice(true);
+          }
+        }
+        setVoteResults((json && json.results) || []);
+      });
   }, 6000);
+
+  //reset the notice icon
+  const resetNoticeIconIfNeeded = () => {
+    if (tab === "2" && showResultsNotice === true) setShowResultsNotice(false);
+  };
 
   const voteRestaurant = (restaurant) => {
     setProposedRestaurant(restaurant);
@@ -62,6 +97,10 @@ export default function App() {
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
+  const handleTabChange = (event, newValue) => {
+    setTab(newValue);
+  };
+
   const handleVoteSuccess = (restaurant) => {
     fetch("//lauri.space/solidabiskoodihaaste22/api/v1/vote/" + restaurant.id, {
       method: "POST"
@@ -73,6 +112,8 @@ export default function App() {
       console.log("POST Status", res.status);
     });
   };
+
+  resetNoticeIconIfNeeded();
 
   return (
     <Container maxWidth="sm">
@@ -87,28 +128,57 @@ export default function App() {
           onChange={(_, newVal) => setSelectedCity(newVal)}
           renderInput={(params) => <TextField {...params} label="Kaupunki" />}
         />
-        {voteResults.length ? <ResultsCard results={voteResults} /> : ""}
       </Stack>
+      <TabContext value={tab}>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <TabList
+            centered
+            onChange={handleTabChange}
+            aria-label="lab API tabs example"
+          >
+            <Tab label="Äänestys" value="1" />
+            <Tab
+              label="Tulokset"
+              icon={
+                showResultsNotice ? (
+                  <NewReleasesIcon fontSize="small" color="primary" />
+                ) : (
+                  <></>
+                )
+              }
+              iconPosition="end"
+              value="2"
+            >
+              derp
+            </Tab>
+          </TabList>
+        </Box>
+        <TabPanel value="1">
+          {selectedCity ? (
+            <div>
+              <h1>{selectedCity.toUpperCase()}</h1>
+              <div class="list">
+                {restaurants.map((restaurant) => (
+                  <Restaurant
+                    restaurant={restaurant}
+                    key={restaurant.id}
+                    selected={
+                      alreadyVotedId ? alreadyVotedId === restaurant.id : false
+                    }
+                    clickVote={voteRestaurant.bind(null, restaurant)}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            ""
+          )}
+        </TabPanel>
+        <TabPanel value="2">
+          {voteResults.length ? <ResultsCard results={voteResults} /> : ""}
+        </TabPanel>
+      </TabContext>
       {alreadyVotedId ? <div>Olet äänestänyt tänään {date}!</div> : ""}
-      {selectedCity ? (
-        <div>
-          <h1>{selectedCity.toUpperCase()}</h1>
-          <div class="list">
-            {restaurants.map((restaurant) => (
-              <Restaurant
-                restaurant={restaurant}
-                key={restaurant.id}
-                selected={
-                  alreadyVotedId ? alreadyVotedId === restaurant.id : false
-                }
-                clickVote={voteRestaurant.bind(null, restaurant)}
-              />
-            ))}
-          </div>
-        </div>
-      ) : (
-        ""
-      )}
       <ConfirmDialog
         handleClose={handleDialogClose}
         openDialog={openDialog}
