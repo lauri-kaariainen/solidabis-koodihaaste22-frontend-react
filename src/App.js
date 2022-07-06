@@ -18,6 +18,8 @@ import TabPanel from "@mui/lab/TabPanel";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import citiesObj from "./cities.json";
 
+import SwipeableViews from "react-swipeable-views";
+
 // const city = "tampere";
 const restaurantSearchUrl =
   "//lauri.space/solidabiskoodihaaste22/api/v1/restaurants/";
@@ -26,14 +28,13 @@ const voteResultsUrl = "//lauri.space/solidabiskoodihaaste22/api/v1/results/";
 
 export default function App() {
   const [restaurants, setRestaurants] = useState([]);
-  // const [activeRestaurant, setActiveRestaurant] = useState(null);
   const [proposedRestaurant, setProposedRestaurant] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedCity, setSelectedCity] = useState("");
   const [voteResults, setVoteResults] = useState([]);
   const [alreadyVotedId, setAlreadyVotedId] = useState(null);
   const [date, setDate] = useState("");
-  const [tab, setTab] = useState("1");
+  const [tab, setTab] = useState("0");
   const [showResultsNotice, setShowResultsNotice] = useState(false);
   // console.log("rendering App");
   const voteResultUpdateIntervalRef = useRef();
@@ -66,7 +67,7 @@ export default function App() {
       .then((json) => {
         //if on vote-tab, calculate if results got changed,
         //this uses just basic stringify comparison
-        if (tab !== "2") {
+        if (tab !== "1") {
           if (
             JSON.stringify((json && json.results) || []) !==
             JSON.stringify(voteResults)
@@ -87,7 +88,7 @@ export default function App() {
 
   //reset the notice icon
   const resetNoticeIconIfNeeded = () => {
-    if (tab === "2" && showResultsNotice === true) setShowResultsNotice(false);
+    if (tab === "1" && showResultsNotice === true) setShowResultsNotice(false);
   };
 
   const voteRestaurant = (restaurant) => {
@@ -99,6 +100,9 @@ export default function App() {
   };
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
+  };
+  const handleTabSwipe = (newValue) => {
+    setTab("" + newValue);
   };
 
   const handleVoteSuccess = (restaurant) => {
@@ -136,7 +140,7 @@ export default function App() {
             onChange={handleTabChange}
             aria-label="lab API tabs example"
           >
-            <Tab label="Äänestys" value="1" />
+            <Tab label="Äänestys" value="0" />
             <Tab
               label="Tulokset"
               icon={
@@ -147,36 +151,44 @@ export default function App() {
                 )
               }
               iconPosition="end"
-              value="2"
+              value="1"
             >
               derp
             </Tab>
           </TabList>
         </Box>
-        <TabPanel value="1">
-          {selectedCity ? (
-            <div>
-              <h1>{selectedCity.toUpperCase()}</h1>
-              <div class="list">
-                {restaurants.map((restaurant) => (
-                  <Restaurant
-                    restaurant={restaurant}
-                    key={restaurant.id}
-                    selected={
-                      alreadyVotedId ? alreadyVotedId === restaurant.id : false
-                    }
-                    clickVote={voteRestaurant.bind(null, restaurant)}
-                  />
-                ))}
+        <SwipeableViews
+          axis={"x"}
+          index={parseInt(tab)}
+          onChangeIndex={handleTabSwipe}
+        >
+          <TabPanel value="0" index={0} dir={"x"}>
+            {selectedCity ? (
+              <div>
+                <h1>{selectedCity.toUpperCase()}</h1>
+                <div class="list">
+                  {restaurants.map((restaurant) => (
+                    <Restaurant
+                      restaurant={restaurant}
+                      key={restaurant.id}
+                      selected={
+                        alreadyVotedId
+                          ? alreadyVotedId === restaurant.id
+                          : false
+                      }
+                      clickVote={voteRestaurant.bind(null, restaurant)}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : (
-            ""
-          )}
-        </TabPanel>
-        <TabPanel value="2">
-          {voteResults.length ? <ResultsCard results={voteResults} /> : ""}
-        </TabPanel>
+            ) : (
+              ""
+            )}
+          </TabPanel>
+          <TabPanel value="1" index={1} dir={"x"}>
+            {voteResults.length ? <ResultsCard results={voteResults} /> : ""}
+          </TabPanel>
+        </SwipeableViews>
       </TabContext>
       {alreadyVotedId ? <div>Olet äänestänyt tänään {date}!</div> : ""}
       <ConfirmDialog
@@ -187,8 +199,6 @@ export default function App() {
         removingVote={
           proposedRestaurant ? alreadyVotedId === proposedRestaurant.id : false
         }
-        // restaurantId={}
-        // setActiveRestaurant={setActiveRestaurant}
         handleVoteSuccess={handleVoteSuccess}
       />
     </Container>
